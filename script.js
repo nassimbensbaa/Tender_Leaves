@@ -238,13 +238,24 @@ async function sendOrder(){
 
     }
 
-    if(phone==""){
+if(phone==""){
 
-        alert("أدخل رقم الهاتف");
+    alert("أدخل رقم الهاتف");
 
-        return;
+    return;
 
-    }
+}
+
+// يجب أن يبدأ بـ 05 أو 06 أو 07 ويتكون من 10 أرقام
+const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+
+if(!phoneRegex.test(phone)){
+
+    alert("رقم الهاتف غير صحيح.\nمثال: 0560212458");
+
+    return;
+
+}
 
     if(wilaya==""){
 
