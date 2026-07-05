@@ -3,12 +3,12 @@ let deliveryData = [];
 let PRODUCT_PRICE = 0;
 let selectedProduct = null;
 
-//============================
+//================================
 // تحميل المناسبات
-//============================
-async function loadProducts() {
+//================================
+async function loadProducts(){
 
-    try {
+    try{
 
         const res = await fetch("/api/products");
 
@@ -30,7 +30,17 @@ async function loadProducts() {
 
         document.getElementById("categories").innerHTML = html;
 
-    } catch(err){
+        // اختيار أول مناسبة تلقائياً
+        if(products.length>0){
+
+            const firstBtn =
+            document.querySelector(".category-btn");
+
+            selectProduct(0,firstBtn);
+
+        }
+
+    }catch(err){
 
         console.log(err);
 
@@ -40,17 +50,28 @@ async function loadProducts() {
 
 }
 
-//============================
+//================================
 // اختيار المناسبة
-//============================
+//================================
 function selectProduct(index,btn){
 
     selectedProduct = products[index];
 
     PRODUCT_PRICE = Number(selectedProduct.price);
 
-    document.getElementById("mainImage").src =
+    const img =
+    document.getElementById("mainImage");
+
+    img.style.opacity="0";
+
+    img.src =
     "images/" + selectedProduct.image;
+
+    img.onload=function(){
+
+        img.style.opacity="1";
+
+    };
 
     document.getElementById("productPrice").innerHTML =
     PRODUCT_PRICE;
@@ -62,35 +83,44 @@ function selectProduct(index,btn){
     .querySelectorAll(".category-btn")
     .forEach(x=>x.classList.remove("active"));
 
-    btn.classList.add("active");
+    if(btn){
+
+        btn.classList.add("active");
+
+    }
 
     updateTotal();
 
 }
 
-//============================
+//================================
 // تحميل الولايات
-//============================
+//================================
 async function loadDelivery(){
 
     try{
 
-        const res = await fetch("/api/delivery");
+        const res =
+        await fetch("/api/delivery");
 
-        deliveryData = await res.json();
+        deliveryData =
+        await res.json();
 
-        let html = '<option value="">اختر الولاية</option>';
+        let html =
+        '<option value="">اختر الولاية</option>';
 
         deliveryData.forEach(w=>{
 
             html += `
-            <option value="${w.name}">
-                ${w.name}
-            </option>`;
+                <option value="${w.name}">
+                    ${w.name}
+                </option>
+            `;
 
         });
 
-        document.getElementById("wilaya").innerHTML = html;
+        document.getElementById("wilaya").innerHTML =
+        html;
 
     }catch(err){
 
@@ -100,9 +130,9 @@ async function loadDelivery(){
 
 }
 
-//============================
-// تغيير الولاية
-//============================
+//================================
+// تحديث السعر عند تغيير الولاية
+//================================
 document.addEventListener("change",function(e){
 
     if(
@@ -120,10 +150,9 @@ document.addEventListener("change",function(e){
     }
 
 });
-
-//============================
-// حساب السعر
-//============================
+//================================
+// حساب المجموع
+//================================
 function updateTotal(){
 
     let deliveryPrice = 0;
@@ -135,16 +164,19 @@ function updateTotal(){
     document.getElementById("deliveryType").value;
 
     const row =
-    deliveryData.find(x=>x.name==wilaya);
+    deliveryData.find(x => x.name == wilaya);
 
     if(row){
 
-        deliveryPrice =
-        deliveryType=="home"
-        ?
-        Number(row.home)
-        :
-        Number(row.office);
+        if(deliveryType=="home"){
+
+            deliveryPrice = Number(row.home);
+
+        }else{
+
+            deliveryPrice = Number(row.office);
+
+        }
 
     }
 
@@ -155,14 +187,15 @@ function updateTotal(){
     PRODUCT_PRICE + deliveryPrice;
 
 }
-//============================
+
+//================================
 // إرسال الطلب
-//============================
+//================================
 async function sendOrder(){
 
     if(selectedProduct==null){
 
-        alert("اختر المناسبة");
+        alert("اختر نوع المناسبة");
 
         return;
 
@@ -264,7 +297,7 @@ async function sendOrder(){
 
     try{
 
-        const res=await fetch("/api/send",{
+        const res = await fetch("/api/send",{
 
             method:"POST",
 
@@ -276,42 +309,35 @@ async function sendOrder(){
 
         });
 
-        const result=await res.json();
+        const result = await res.json();
 
         if(result.ok){
 
             document.getElementById("successModal").style.display="flex";
 
-            document.getElementById("recipientName").value="";
+                    document.getElementById("recipientName").value = "";
 
-            document.getElementById("notes").value="";
+            document.getElementById("notes").value = "";
 
-            document.getElementById("fullName").value="";
+            document.getElementById("fullName").value = "";
 
-            document.getElementById("phone").value="";
+            document.getElementById("phone").value = "";
 
-            document.getElementById("officeName").value="";
+            document.getElementById("officeName").value = "";
 
-            document.getElementById("wilaya").selectedIndex=0;
+            document.getElementById("wilaya").selectedIndex = 0;
 
-            document.getElementById("deliveryType").selectedIndex=0;
+            document.getElementById("deliveryType").selectedIndex = 0;
 
-            document.getElementById("mainImage").src="images/no-image.jpg";
+            // العودة لأول مناسبة بعد نجاح الطلب
+            if(products.length){
 
-            document.getElementById("productPrice").innerHTML="0";
+                const firstBtn =
+                document.querySelector(".category-btn");
 
-            document.getElementById("priceValue").innerHTML="0";
+                selectProduct(0,firstBtn);
 
-            document.getElementById("deliveryPrice").innerHTML="0";
-
-            document.getElementById("totalPrice").innerHTML="0";
-
-            document.querySelectorAll(".category-btn")
-            .forEach(x=>x.classList.remove("active"));
-
-            PRODUCT_PRICE=0;
-
-            selectedProduct=null;
+            }
 
         }else{
 
@@ -329,18 +355,22 @@ async function sendOrder(){
 
 }
 
-//============================
-// إغلاق النافذة
-//============================
+//================================
+// إغلاق نافذة النجاح
+//================================
 function closeModal(){
 
-    document.getElementById("successModal").style.display="none";
+    document.getElementById("successModal").style.display = "none";
 
 }
 
-//============================
-// بدء التشغيل
-//============================
-loadProducts();
+//================================
+// تشغيل التطبيق
+//================================
+window.onload = function(){
 
-loadDelivery();
+    loadProducts();
+
+    loadDelivery();
+
+};
