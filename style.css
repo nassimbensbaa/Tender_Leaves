@@ -1,6 +1,6 @@
-/*====================================
-  إعدادات عامة
-====================================*/
+/*==================================
+        AURES BATNA DZ
+===================================*/
 
 *{
     margin:0;
@@ -15,23 +15,27 @@ html{
 
 body{
 
-    background:#050505;
+    background:#F7F2EB;
 
-    color:#fff;
+    color:#4E382C;
 
-    line-height:1.7;
+    line-height:1.8;
 
 }
 
-/*====================================
-  البانر العلوي
-====================================*/
+/*==================================
+        البانر العلوي
+===================================*/
 
 .hero{
 
     width:100%;
 
-    background:#000;
+    background:#EFE4D6;
+
+    overflow:hidden;
+
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
 
 }
 
@@ -43,9 +47,9 @@ body{
 
 }
 
-/*====================================
-  المحتوى
-====================================*/
+/*==================================
+        المحتوى
+===================================*/
 
 .container{
 
@@ -53,9 +57,7 @@ body{
 
     max-width:1200px;
 
-    margin:auto;
-
-    padding:20px 0 40px;
+    margin:35px auto;
 
 }
 
@@ -63,13 +65,13 @@ body{
 
     text-align:center;
 
-    font-size:38px;
+    font-size:42px;
+
+    color:#7A522A;
 
     font-weight:800;
 
-    margin-top:15px;
-
-    color:#ffffff;
+    margin-bottom:8px;
 
 }
 
@@ -77,165 +79,148 @@ body{
 
     text-align:center;
 
-    color:#bbbbbb;
+    color:#7B6857;
 
-    margin:10px 0 30px;
+    font-size:19px;
 
-    font-size:18px;
+    margin-bottom:35px;
 
 }
 
-/*====================================
-  الصورة
-====================================*/
+/*==================================
+        عرض الصورة
+===================================*/
 
 .viewer{
 
-    width:100%;
+    background:#FFFFFF;
 
-    background:#111;
+    border:2px solid #DFC49A;
 
-    border-radius:20px;
+    border-radius:22px;
 
     overflow:hidden;
 
-    border:2px solid #2d2d2d;
-
-    box-shadow:0 0 25px rgba(255,215,0,.08);
-
-}
-
-.viewer{
-
-    width:100%;
-
-    background:#111;
-
-    border-radius:20px;
-
     padding:20px;
 
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    min-height:500px;
+    box-shadow:0 10px 35px rgba(0,0,0,.08);
 
 }
 
 .viewer img{
 
-    max-width:100%;
+    width:100%;
 
-    max-height:650px;
-
-    width:auto;
-
-    height:auto;
+    max-height:720px;
 
     object-fit:contain;
 
-    transition:.4s;
+    display:block;
+
+    margin:auto;
+
+    transition:.45s;
 
 }
-/*====================================
-  عنوان المناسبات
-====================================*/
+
+/*==================================
+        عنوان المناسبات
+===================================*/
 
 .category-title{
 
-    margin:30px 0 18px;
-
     text-align:center;
 
-    font-size:28px;
+    margin:35px 0 20px;
 
-    font-weight:700;
+    font-size:30px;
 
-    color:#FFD700;
+    font-weight:800;
+
+    color:#B88939;
 
 }
-
-/*====================================
-  أزرار المناسبات
-====================================*/
+/*==================================
+        أزرار المناسبات
+===================================*/
 
 .categories{
 
     display:flex;
 
-    flex-wrap:wrap;
-
     justify-content:center;
 
-    gap:14px;
+    flex-wrap:wrap;
 
-    margin-bottom:30px;
+    gap:15px;
+
+    margin-bottom:35px;
 
 }
 
 .category-btn{
 
-    background:#181818;
+    background:#FFFDFB;
 
-    color:#fff;
+    color:#7A522A;
 
-    border:1px solid #444;
+    border:2px solid #D8B06A;
 
-    padding:14px 24px;
+    border-radius:40px;
 
-    border-radius:35px;
-
-    cursor:pointer;
+    padding:14px 28px;
 
     font-size:17px;
 
     font-weight:700;
 
+    cursor:pointer;
+
     transition:.35s;
 
 }
+
 .category-btn:hover{
 
-    background:#FFD700;
+    background:#D8B06A;
 
-    color:#000;
+    color:#fff;
 
     transform:translateY(-3px);
 
-    box-shadow:0 8px 20px rgba(255,215,0,.35);
+    box-shadow:0 8px 18px rgba(184,137,57,.25);
 
 }
 
 .category-btn.active{
 
-    background:#FFD700;
+    background:#B88939;
 
-    color:#000;
+    color:#fff;
 
-    border-color:#FFD700;
+    border-color:#B88939;
 
-    box-shadow:0 0 18px rgba(255,215,0,.45);
+    box-shadow:0 8px 20px rgba(184,137,57,.35);
 
 }
 
-/*====================================
-  بطاقة الطلب
-====================================*/
+/*==================================
+        بطاقة الطلب
+===================================*/
 
 .card{
 
-    background:#111;
+    background:#FFFDFB;
 
-    border:1px solid #2d2d2d;
+    border:1px solid #E8D8C4;
 
-    border-radius:20px;
+    border-radius:22px;
 
     padding:30px;
 
-    box-shadow:0 0 25px rgba(255,255,255,.05);
+    margin-top:25px;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.08);
 
 }
 
@@ -245,9 +230,9 @@ body{
 
     font-size:34px;
 
-    font-weight:800;
+    color:#B88939;
 
-    color:#FFD700;
+    font-weight:800;
 
     margin-bottom:25px;
 
@@ -265,11 +250,9 @@ body{
 
     margin-bottom:8px;
 
-    font-size:17px;
-
     font-weight:700;
 
-    color:#fff;
+    color:#6E4A2D;
 
 }
 
@@ -279,15 +262,15 @@ textarea{
 
     width:100%;
 
-    background:#1b1b1b;
+    padding:15px;
 
-    color:#fff;
-
-    border:1px solid #333;
+    border:1px solid #D8C4AF;
 
     border-radius:12px;
 
-    padding:15px;
+    background:#FFFFFF;
+
+    color:#4E382C;
 
     font-size:16px;
 
@@ -301,9 +284,9 @@ input:focus,
 select:focus,
 textarea:focus{
 
-    border-color:#FFD700;
+    border-color:#B88939;
 
-    box-shadow:0 0 10px rgba(255,215,0,.25);
+    box-shadow:0 0 10px rgba(184,137,57,.20);
 
 }
 
@@ -315,21 +298,21 @@ textarea{
 
 }
 
-/*====================================
-  ملخص الأسعار
-====================================*/
+/*==================================
+        ملخص الأسعار
+===================================*/
 
 .summary{
 
-    background:#1b1b1b;
+    margin-top:20px;
 
-    border:1px solid #333;
+    background:#F9F5F0;
+
+    border:1px solid #E8D8C4;
 
     border-radius:15px;
 
     padding:18px;
-
-    margin-top:20px;
 
 }
 
@@ -339,24 +322,32 @@ textarea{
 
     justify-content:space-between;
 
-    margin:12px 0;
+    padding:10px 0;
 
     font-size:18px;
+
+    border-bottom:1px dashed #E8D8C4;
+
+}
+
+.summary-row:last-child{
+
+    border-bottom:none;
 
 }
 
 .summary-row.total{
 
-    color:#FFD700;
+    color:#B88939;
 
     font-size:22px;
 
     font-weight:800;
 
 }
-/*====================================
-  زر الطلب
-====================================*/
+/*==================================
+        زر الطلب
+===================================*/
 
 .order-btn{
 
@@ -370,9 +361,9 @@ textarea{
 
     border-radius:14px;
 
-    background:linear-gradient(135deg,#FFD700,#F5B700);
+    background:linear-gradient(135deg,#D7B06A,#B88939);
 
-    color:#000;
+    color:#fff;
 
     font-size:22px;
 
@@ -382,43 +373,47 @@ textarea{
 
     transition:.35s;
 
+    letter-spacing:.5px;
+
 }
 
 .order-btn:hover{
 
     transform:translateY(-3px);
 
-    box-shadow:0 10px 25px rgba(255,215,0,.40);
+    box-shadow:0 10px 25px rgba(184,137,57,.35);
 
 }
 
-/*====================================
-  مميزات المتجر
-====================================*/
+/*==================================
+        مميزات المتجر
+===================================*/
 
 .features{
-
-    margin-top:30px;
 
     display:grid;
 
     grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
 
-    gap:15px;
+    gap:18px;
+
+    margin-top:35px;
 
 }
 
 .feature{
 
-    background:#181818;
+    background:#FFF;
 
-    border:1px solid #333;
+    border:1px solid #E8D8C4;
 
-    border-radius:15px;
+    border-radius:16px;
 
-    padding:18px;
+    padding:20px;
 
     text-align:center;
+
+    color:#6E4A2D;
 
     font-size:17px;
 
@@ -426,27 +421,31 @@ textarea{
 
     transition:.3s;
 
+    box-shadow:0 5px 15px rgba(0,0,0,.05);
+
 }
 
 .feature:hover{
 
-    border-color:#FFD700;
+    border-color:#B88939;
 
-    transform:translateY(-4px);
+    transform:translateY(-5px);
+
+    box-shadow:0 12px 25px rgba(184,137,57,.18);
 
 }
 
-/*====================================
-  الفوتر
-====================================*/
+/*==================================
+        الفوتر
+===================================*/
 
 .footer{
 
-    margin-top:50px;
+    margin-top:60px;
 
-    background:#000;
+    background:#6E4A2D;
 
-    border-top:2px solid #222;
+    color:#fff;
 
     text-align:center;
 
@@ -456,29 +455,31 @@ textarea{
 
 .footer-title{
 
-    font-size:28px;
+    font-size:30px;
 
     font-weight:800;
 
-    color:#FFD700;
+    color:#F5D48A;
+
+    margin-bottom:10px;
 
 }
 
 .footer-text{
 
-    margin-top:10px;
-
-    color:#bbb;
+    color:#F7F2EB;
 
     font-size:17px;
+
+    margin-bottom:20px;
 
 }
 
 .footer-services{
 
-    margin:25px auto;
-
     max-width:700px;
+
+    margin:auto;
 
 }
 
@@ -494,9 +495,11 @@ textarea{
 
     display:inline-block;
 
-    margin-top:20px;
+    margin-top:25px;
 
     padding:15px 35px;
+
+    border-radius:12px;
 
     background:#1877F2;
 
@@ -504,11 +507,9 @@ textarea{
 
     text-decoration:none;
 
-    font-size:20px;
+    font-size:19px;
 
     font-weight:700;
-
-    border-radius:12px;
 
     transition:.3s;
 
@@ -516,7 +517,7 @@ textarea{
 
 .facebook-btn:hover{
 
-    background:#0e5fd1;
+    background:#125FCC;
 
     transform:scale(1.05);
 
@@ -526,14 +527,14 @@ textarea{
 
     margin-top:30px;
 
-    color:#888;
+    color:#E8D8C4;
 
     font-size:15px;
 
 }
-/*====================================
-  نافذة نجاح الطلب
-====================================*/
+/*==================================
+        نافذة نجاح الطلب
+===================================*/
 
 .modal{
 
@@ -543,13 +544,15 @@ textarea{
 
     inset:0;
 
-    background:rgba(0,0,0,.75);
+    background:rgba(0,0,0,.55);
 
     justify-content:center;
 
     align-items:center;
 
     z-index:9999;
+
+    backdrop-filter:blur(5px);
 
 }
 
@@ -559,19 +562,17 @@ textarea{
 
     max-width:430px;
 
-    background:#111;
+    background:#FFFDFB;
 
-    border:1px solid #FFD700;
+    border:2px solid #D7B06A;
 
-    border-radius:20px;
+    border-radius:22px;
 
     padding:35px;
 
     text-align:center;
 
-    color:#fff;
-
-    box-shadow:0 0 35px rgba(255,215,0,.20);
+    box-shadow:0 20px 50px rgba(0,0,0,.20);
 
 }
 
@@ -579,47 +580,49 @@ textarea{
 
     font-size:70px;
 
-    margin-bottom:20px;
+    margin-bottom:15px;
 
 }
 
 .modal-content h2{
 
-    color:#FFD700;
+    color:#B88939;
 
     margin-bottom:15px;
+
+    font-size:28px;
 
 }
 
 .modal-content p{
 
-    color:#ddd;
-
-    margin-bottom:10px;
+    color:#6E4A2D;
 
     line-height:1.8;
+
+    margin-bottom:12px;
 
 }
 
 .close-btn{
 
-    margin-top:20px;
+    margin-top:18px;
 
     border:none;
 
-    background:#FFD700;
+    background:#B88939;
 
-    color:#000;
+    color:#fff;
 
     padding:14px 35px;
 
-    border-radius:10px;
-
-    cursor:pointer;
+    border-radius:12px;
 
     font-size:17px;
 
     font-weight:bold;
+
+    cursor:pointer;
 
     transition:.3s;
 
@@ -627,15 +630,13 @@ textarea{
 
 .close-btn:hover{
 
-    transform:translateY(-2px);
-
-    box-shadow:0 8px 18px rgba(255,215,0,.35);
+    background:#9F722D;
 
 }
 
-/*====================================
-  شريط التمرير
-====================================*/
+/*==================================
+        Scroll
+===================================*/
 
 ::-webkit-scrollbar{
 
@@ -645,51 +646,113 @@ textarea{
 
 ::-webkit-scrollbar-track{
 
-    background:#111;
+    background:#F7F2EB;
 
 }
 
 ::-webkit-scrollbar-thumb{
 
-    background:#FFD700;
+    background:#C79B4D;
 
-    border-radius:10px;
+    border-radius:20px;
 
 }
 
-/*====================================
-  تصميم الهاتف
-====================================*/
+::-webkit-scrollbar-thumb:hover{
+
+    background:#B88939;
+
+}
+
+/*==================================
+        الحركات
+===================================*/
+
+.viewer img{
+
+    animation:fadeImage .5s;
+
+}
+
+@keyframes fadeImage{
+
+    from{
+
+        opacity:0;
+
+        transform:scale(.97);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+.card,
+.viewer,
+.feature{
+
+    transition:.35s;
+
+}
+
+.viewer:hover{
+
+    transform:translateY(-3px);
+
+}
+
+.card:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/*==================================
+        تصميم الهاتف
+===================================*/
 
 @media(max-width:768px){
 
-.hero-image{
+.container{
 
-    width:100%;
+    width:96%;
 
 }
 
 .site-title{
 
-    font-size:28px;
+    font-size:30px;
 
 }
 
 .site-desc{
 
-    font-size:15px;
+    font-size:16px;
 
 }
 
 .category-title{
 
-    font-size:22px;
+    font-size:23px;
+
+}
+
+.viewer{
+
+    padding:10px;
 
 }
 
 .viewer img{
 
-    aspect-ratio:4/3;
+    max-height:420px;
 
 }
 
@@ -701,7 +764,7 @@ textarea{
 
 .category-btn{
 
-    width:46%;
+    width:47%;
 
     padding:12px;
 
@@ -729,7 +792,7 @@ textarea{
 
 .summary-row.total{
 
-    font-size:19px;
+    font-size:20px;
 
 }
 
@@ -751,9 +814,21 @@ textarea{
 
 }
 
+.footer{
+
+    padding:35px 15px;
+
+}
+
 .footer-title{
 
     font-size:24px;
+
+}
+
+.footer-services div{
+
+    font-size:16px;
 
 }
 
@@ -762,6 +837,12 @@ textarea{
     width:100%;
 
     font-size:18px;
+
+}
+
+.modal-content{
+
+    padding:25px;
 
 }
 
