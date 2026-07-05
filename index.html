@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>بيع الصور الرقمية</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+
+        <img src="images/logo.png" alt="Logo">
+
+    </div>
+
+    <h1>بيع الصور الرقمية</h1>
+
+    <p>اختر المناسبة ثم اطلب التصميم</p>
+
+</header>
+
+<div class="container">
+
+    <div class="viewer">
+
+        <img id="mainImage" src="images/no-image.jpg" alt="الصورة">
+
+    </div>
+
+    <div class="card">
+
+        <div class="form-group">
+
+            <label>نوع المناسبة</label>
+
+            <select id="product">
+
+                <option>جاري التحميل...</option>
+
+            </select>
+
+        </div>
+
+        <div class="price">
+
+            السعر :
+
+            <span id="productPrice">
+
+                0
+
+            </span>
+
+            دج
+
+        </div>
+
+        <div class="form-group">
+
+            <label>اسم المهدى إليه</label>
+
+            <input
+
+                id="recipientName"
+
+                type="text"
+
+                placeholder="مثال : أحمد">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>الاسم الكامل</label>
+
+            <input
+
+                id="fullName"
+
+                type="text"
+
+                placeholder="الاسم الكامل">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>رقم الهاتف</label>
+
+            <input
+
+                id="phone"
+
+                type="text"
+
+                placeholder="رقم الهاتف">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>الولاية</label>
+
+            <select id="wilaya">
+
+                <option>
+
+                    جاري التحميل...
+
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>نوع التوصيل</label>
+
+            <select id="deliveryType">
+
+                <option value="home">
+
+                    إلى المنزل
+
+                </option>
+
+                <option value="office">
+
+                    إلى المكتب
+
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                اسم مكتب التوصيل
+
+            </label>
+
+            <input
+
+                id="officeName"
+
+                type="text"
+
+                placeholder="اختياري">
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+
+                تفاصيل التصميم
+
+            </label>
+
+            <textarea
+
+                id="notes"
+
+                rows="7"
+
+                placeholder="اكتب جميع التفاصيل التي تريد إضافتها إلى التصميم..."></textarea>
+
+        </div>
+        <div class="summary">
+
+            <div>
+
+                سعر الصورة :
+
+                <span id="priceValue">
+
+                    0
+
+                </span>
+
+                دج
+
+            </div>
+
+            <div>
+
+                سعر التوصيل :
+
+                <span id="deliveryPrice">
+
+                    0
+
+                </span>
+
+                دج
+
+            </div>
+
+            <div>
+
+                الإجمالي :
+
+                <span id="totalPrice">
+
+                    0
+
+                </span>
+
+                دج
+
+            </div>
+
+        </div>
+
+        <button
+
+            class="order-btn"
+
+            onclick="sendOrder()">
+
+            اطلب الآن
+
+        </button>
+
+    </div>
+
+</div>
+
+<div
+
+    class="modal"
+
+    id="successModal">
+
+    <div class="modal-content">
+
+        <h2>
+
+            ✅ تم إرسال الطلب
+
+        </h2>
+
+        <p>
+
+            سوف يتم التواصل معكم في أقرب وقت.
+
+        </p>
+
+        <button
+
+            class="close-btn"
+
+            onclick="closeModal()">
+
+            إغلاق
+
+        </button>
+
+    </div>
+
+</div>
+
+<footer>
+
+    © 2026 جميع الحقوق محفوظة
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
