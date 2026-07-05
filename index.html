@@ -3,57 +3,74 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
 
-<title>بيع الصور الرقمية</title>
+    <title>AURES BATNA DZ | بيع الصور الرقمية</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-<link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 
-<!-- الصورة العلوية -->
+<!--=========================
+    البانر العلوي
+==========================-->
 
 <header class="hero">
 
-    <img src="images/logo.png.gif" class="hero-image" alt="Banner">
+    <img src="images/logo.png.gif"
+         class="hero-image"
+         alt="AURES BATNA DZ">
 
 </header>
 
-<h1 class="title">
-بيع الصور الرقمية
-</h1>
-
-<p class="subtitle">
-اختر المناسبة بالضغط على أحد الأزرار
-</p>
+<!--=========================
+    المحتوى
+==========================-->
 
 <div class="container">
 
-    <!-- الصورة الرئيسية -->
+    <h1 class="site-title">
+
+        بيع الصور الرقمية
+
+    </h1>
+
+    <p class="site-desc">
+
+        اختر نوع المناسبة ثم أكمل معلومات الطلب
+
+    </p>
 
     <div class="viewer">
 
         <img
             id="mainImage"
-            src="images/no-image.jpg"
-            alt="الصورة">
+            src=""
+            alt="صورة المناسبة">
 
     </div>
 
-    <!-- أزرار المناسبات -->
+    <div class="category-title">
+
+        ✨ اختر نوع المناسبة ✨
+
+    </div>
 
     <div
         id="categories"
         class="categories">
 
-        <button
-            class="category-btn">
+        <button class="category-btn">
 
             جاري تحميل المناسبات...
 
@@ -61,13 +78,11 @@
 
     </div>
 
-    <!-- بطاقة الطلب -->
-
     <div class="card">
 
-        <div class="price">
+        <div class="price-box">
 
-            السعر :
+            السعر
 
             <span id="productPrice">
 
@@ -88,8 +103,8 @@
             </label>
 
             <input
-                id="recipientName"
                 type="text"
+                id="recipientName"
                 placeholder="مثال : محمد">
 
         </div>
@@ -103,8 +118,8 @@
             </label>
 
             <input
-                id="fullName"
                 type="text"
+                id="fullName"
                 placeholder="الاسم الكامل">
 
         </div>
@@ -118,9 +133,9 @@
             </label>
 
             <input
-                id="phone"
                 type="text"
-                placeholder="رقم الهاتف">
+                id="phone"
+                placeholder="05XXXXXXXX">
 
         </div>
 
@@ -143,8 +158,7 @@
             </select>
 
         </div>
-
-        <div class="form-group">
+                <div class="form-group">
 
             <label>
 
@@ -156,13 +170,13 @@
 
                 <option value="home">
 
-                    إلى المنزل
+                    🚚 إلى المنزل
 
                 </option>
 
                 <option value="office">
 
-                    إلى المكتب
+                    📦 إلى مكتب التوصيل
 
                 </option>
 
@@ -174,15 +188,18 @@
 
             <label>
 
-                اسم مكتب التوصيل
+                اسم مكتب التوصيل (اختياري)
 
             </label>
 
             <input
-                id="officeName"
                 type="text"
-                placeholder="اختياري">
-                        <div class="form-group">
+                id="officeName"
+                placeholder="اسم مكتب التوصيل">
+
+        </div>
+
+        <div class="form-group">
 
             <label>
 
@@ -192,52 +209,81 @@
 
             <textarea
                 id="notes"
-                rows="7"
-                placeholder="اكتب جميع التفاصيل التي تريد إضافتها إلى التصميم..."></textarea>
+                rows="6"
+                placeholder="مثال:
+- لون الخلفية
+- اسم العريس والعروس
+- التاريخ
+- الدعاء أو العبارة
+- أي تفاصيل أخرى تريد إضافتها"></textarea>
 
         </div>
 
         <div class="summary">
 
-            <div>
+            <div class="summary-row">
 
-                سعر الصورة :
+                <span>
 
-                <span id="priceValue">
-
-                    0
+                    سعر الصورة
 
                 </span>
 
-                دج
+                <strong>
+
+                    <span id="priceValue">
+
+                        0
+
+                    </span>
+
+                    دج
+
+                </strong>
 
             </div>
 
-            <div>
+            <div class="summary-row">
 
-                سعر التوصيل :
+                <span>
 
-                <span id="deliveryPrice">
-
-                    0
+                    سعر التوصيل
 
                 </span>
 
-                دج
+                <strong>
+
+                    <span id="deliveryPrice">
+
+                        0
+
+                    </span>
+
+                    دج
+
+                </strong>
 
             </div>
 
-            <div>
+            <div class="summary-row total">
 
-                الإجمالي :
+                <span>
 
-                <span id="totalPrice">
-
-                    0
+                    الإجمالي
 
                 </span>
 
-                دج
+                <strong>
+
+                    <span id="totalPrice">
+
+                        0
+
+                    </span>
+
+                    دج
+
+                </strong>
 
             </div>
 
@@ -247,13 +293,38 @@
             class="order-btn"
             onclick="sendOrder()">
 
-            اطلب الآن
+            🛒 اطلب الآن
 
         </button>
+
+        <div class="features">
+
+            <div class="feature">
+                🎨 تصميم احترافي بجودة عالية
+            </div>
+
+            <div class="feature">
+                🚚 التوصيل إلى 69 ولاية
+            </div>
+
+            <div class="feature">
+                💰 الدفع عند الاستلام
+            </div>
+
+            <div class="feature">
+                ⚡ تنفيذ سريع
+            </div>
+
+            <div class="feature">
+                📞 مصلحة الزبائن : 0560212458
+            </div>
+
+        </div>
 
     </div>
 
 </div>
+<!-- نافذة نجاح الطلب -->
 
 <div
     class="modal"
@@ -261,15 +332,27 @@
 
     <div class="modal-content">
 
+        <div class="success-icon">
+
+            ✅
+
+        </div>
+
         <h2>
 
-            ✅ تم إرسال الطلب
+            تم إرسال طلبك بنجاح
 
         </h2>
 
         <p>
 
-            سوف يتم التواصل معكم في أقرب وقت.
+            شكراً لثقتكم بنا ❤️
+
+        </p>
+
+        <p>
+
+            سيتم التواصل معكم في أقرب وقت لتأكيد الطلب.
 
         </p>
 
@@ -285,14 +368,56 @@
 
 </div>
 
-<footer>
+<footer class="footer">
 
-    © 2026 جميع الحقوق محفوظة
+    <div class="footer-title">
+
+        AURES BATNA DZ
+
+    </div>
+
+    <div class="footer-text">
+
+        متجر متخصص في تصميم الصور الرقمية لجميع المناسبات
+
+    </div>
+
+    <div class="footer-services">
+
+        <div>📞 مصلحة الزبائن : <strong>0560212458</strong></div>
+
+        <div>🚚 التوصيل إلى 69 ولاية</div>
+
+        <div>💰 الدفع عند الاستلام</div>
+
+        <div>🎨 جودة عالية</div>
+
+        <div>⚡ تنفيذ سريع</div>
+
+    </div>
+
+    <a
+        href="https://www.facebook.com/profile.php?id=61590392371436"
+        target="_blank"
+        class="facebook-btn">
+
+        📘 تابعنا على Facebook
+
+        <br>
+
+        <strong>AURES BATNA DZ</strong>
+
+    </a>
+
+    <div class="copyright">
+
+        © 2026 جميع الحقوق محفوظة
+
+    </div>
 
 </footer>
 
 <script src="script.js"></script>
-
 </body>
 
 </html>
