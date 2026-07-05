@@ -4,7 +4,7 @@ let PRODUCT_PRICE = 0;
 let selectedProduct = null;
 
 //============================
-// تحميل المنتجات
+// تحميل المناسبات
 //============================
 async function loadProducts() {
 
@@ -14,35 +14,66 @@ async function loadProducts() {
 
         products = await res.json();
 
-        let html = '<option value="">اختر نوع المناسبة</option>';
+        let html = "";
 
-        products.forEach(p => {
+        products.forEach((p,index)=>{
 
             html += `
-            <option value="${p.id}">
-                ${p.name}
-            </option>`;
+                <button
+                    class="category-btn"
+                    onclick="selectProduct(${index},this)">
+                    ${p.name}
+                </button>
+            `;
 
         });
 
-        document.getElementById("product").innerHTML = html;
+        document.getElementById("categories").innerHTML = html;
 
-    } catch (err) {
+    } catch(err){
 
         console.log(err);
 
-        alert("تعذر تحميل المنتجات");
+        alert("تعذر تحميل المناسبات");
 
     }
 
 }
 
 //============================
+// اختيار المناسبة
+//============================
+function selectProduct(index,btn){
+
+    selectedProduct = products[index];
+
+    PRODUCT_PRICE = Number(selectedProduct.price);
+
+    document.getElementById("mainImage").src =
+    "images/" + selectedProduct.image;
+
+    document.getElementById("productPrice").innerHTML =
+    PRODUCT_PRICE;
+
+    document.getElementById("priceValue").innerHTML =
+    PRODUCT_PRICE;
+
+    document
+    .querySelectorAll(".category-btn")
+    .forEach(x=>x.classList.remove("active"));
+
+    btn.classList.add("active");
+
+    updateTotal();
+
+}
+
+//============================
 // تحميل الولايات
 //============================
-async function loadDelivery() {
+async function loadDelivery(){
 
-    try {
+    try{
 
         const res = await fetch("/api/delivery");
 
@@ -50,7 +81,7 @@ async function loadDelivery() {
 
         let html = '<option value="">اختر الولاية</option>';
 
-        deliveryData.forEach(w => {
+        deliveryData.forEach(w=>{
 
             html += `
             <option value="${w.name}">
@@ -61,7 +92,7 @@ async function loadDelivery() {
 
         document.getElementById("wilaya").innerHTML = html;
 
-    } catch (err) {
+    }catch(err){
 
         console.log(err);
 
@@ -70,37 +101,7 @@ async function loadDelivery() {
 }
 
 //============================
-// اختيار المناسبة
-//============================
-document.addEventListener("change", function(e){
-
-    if(e.target.id=="product"){
-
-        const id=e.target.value;
-
-        selectedProduct=products.find(x=>x.id==id);
-
-        if(!selectedProduct)return;
-
-        PRODUCT_PRICE=Number(selectedProduct.price);
-
-        document.getElementById("mainImage").src=
-        "images/"+selectedProduct.image;
-
-        document.getElementById("productPrice").innerHTML=
-        PRODUCT_PRICE;
-
-        document.getElementById("priceValue").innerHTML=
-        PRODUCT_PRICE;
-
-        updateTotal();
-
-    }
-
-});
-
-//============================
-// تغيير الولاية أو نوع التوصيل
+// تغيير الولاية
 //============================
 document.addEventListener("change",function(e){
 
@@ -119,8 +120,9 @@ document.addEventListener("change",function(e){
     }
 
 });
+
 //============================
-// حساب المجموع
+// حساب السعر
 //============================
 function updateTotal(){
 
@@ -137,15 +139,12 @@ function updateTotal(){
 
     if(row){
 
-        if(deliveryType=="home"){
-
-            deliveryPrice = Number(row.home);
-
-        }else{
-
-            deliveryPrice = Number(row.office);
-
-        }
+        deliveryPrice =
+        deliveryType=="home"
+        ?
+        Number(row.home)
+        :
+        Number(row.office);
 
     }
 
@@ -156,7 +155,6 @@ function updateTotal(){
     PRODUCT_PRICE + deliveryPrice;
 
 }
-
 //============================
 // إرسال الطلب
 //============================
@@ -164,7 +162,7 @@ async function sendOrder(){
 
     if(selectedProduct==null){
 
-        alert("اختر نوع المناسبة");
+        alert("اختر المناسبة");
 
         return;
 
@@ -201,7 +199,7 @@ async function sendOrder(){
 
     if(fullName==""){
 
-        alert("أدخل الاسم");
+        alert("أدخل الاسم الكامل");
 
         return;
 
@@ -236,11 +234,11 @@ async function sendOrder(){
     const total =
     PRODUCT_PRICE + deliveryPrice;
 
-    const orderData = {
+    const orderData={
 
-        productName : selectedProduct.name,
+        productName:selectedProduct.name,
 
-        image : selectedProduct.image,
+        image:selectedProduct.image,
 
         recipientName,
 
@@ -256,16 +254,17 @@ async function sendOrder(){
 
         officeName,
 
-        productPrice : PRODUCT_PRICE,
+        productPrice:PRODUCT_PRICE,
 
         deliveryPrice,
 
         total
 
     };
+
     try{
 
-        const res = await fetch("/api/send",{
+        const res=await fetch("/api/send",{
 
             method:"POST",
 
@@ -277,7 +276,7 @@ async function sendOrder(){
 
         });
 
-        const result = await res.json();
+        const result=await res.json();
 
         if(result.ok){
 
@@ -293,7 +292,9 @@ async function sendOrder(){
 
             document.getElementById("officeName").value="";
 
-            document.getElementById("product").selectedIndex=0;
+            document.getElementById("wilaya").selectedIndex=0;
+
+            document.getElementById("deliveryType").selectedIndex=0;
 
             document.getElementById("mainImage").src="images/no-image.jpg";
 
@@ -304,6 +305,9 @@ async function sendOrder(){
             document.getElementById("deliveryPrice").innerHTML="0";
 
             document.getElementById("totalPrice").innerHTML="0";
+
+            document.querySelectorAll(".category-btn")
+            .forEach(x=>x.classList.remove("active"));
 
             PRODUCT_PRICE=0;
 
@@ -326,7 +330,7 @@ async function sendOrder(){
 }
 
 //============================
-// إغلاق نافذة النجاح
+// إغلاق النافذة
 //============================
 function closeModal(){
 
