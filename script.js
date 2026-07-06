@@ -4,21 +4,6 @@ let PRODUCT_PRICE = 0;
 let selectedProduct = null;
 
 //================================
-// تنسيق السعر
-//================================
-function formatPrice(price){
-
-    const parts = Number(price)
-    .toFixed(2)
-    .split(".");
-
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g," ");
-
-    return parts.join(".") + " دج";
-
-}
-
-//================================
 // تحميل المناسبات
 //================================
 async function loadProducts(){
@@ -82,17 +67,17 @@ function selectProduct(index,btn){
     img.src =
     "images/" + selectedProduct.image;
 
-    img.onload = function(){
+    img.onload=function(){
 
         img.style.opacity="1";
 
     };
 
     document.getElementById("productPrice").innerHTML =
-    formatPrice(PRODUCT_PRICE);
+    PRODUCT_PRICE;
 
     document.getElementById("priceValue").innerHTML =
-    formatPrice(PRODUCT_PRICE);
+    PRODUCT_PRICE;
 
     document
     .querySelectorAll(".category-btn")
@@ -107,6 +92,7 @@ function selectProduct(index,btn){
     updateTotal();
 
 }
+
 //================================
 // تحميل الولايات
 //================================
@@ -164,7 +150,6 @@ document.addEventListener("change",function(e){
     }
 
 });
-
 //================================
 // حساب المجموع
 //================================
@@ -196,12 +181,13 @@ function updateTotal(){
     }
 
     document.getElementById("deliveryPrice").innerHTML =
-    formatPrice(deliveryPrice);
+    deliveryPrice;
 
     document.getElementById("totalPrice").innerHTML =
-    formatPrice(PRODUCT_PRICE + deliveryPrice);
+    PRODUCT_PRICE + deliveryPrice;
 
 }
+
 //================================
 // إرسال الطلب
 //================================
@@ -252,23 +238,23 @@ async function sendOrder(){
 
     }
 
-    if(phone==""){
+if(phone==""){
 
-        alert("أدخل رقم الهاتف");
+    alert("أدخل رقم الهاتف");
 
-        return;
+    return;
 
-    }
+}
 
-    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+const phoneRegex = /^(05|06|07)[0-9]{8}$/;
 
-    if(!phoneRegex.test(phone)){
+if(!phoneRegex.test(phone)){
 
-        alert("يرجى إدخال رقم هاتف صحيح");
+    alert("يرجى إدخال رقم هاتف صحيح");
 
-        return;
+    return;
 
-    }
+}
 
     if(wilaya==""){
 
@@ -335,11 +321,11 @@ async function sendOrder(){
 
         const result = await res.json();
 
-            if(result.ok){
+        if(result.ok){
 
-            document.getElementById("successModal").style.display = "flex";
+            document.getElementById("successModal").style.display="flex";
 
-            document.getElementById("recipientName").value = "";
+                    document.getElementById("recipientName").value = "";
 
             document.getElementById("notes").value = "";
 
@@ -353,19 +339,7 @@ async function sendOrder(){
 
             document.getElementById("deliveryType").selectedIndex = 0;
 
-            document.getElementById("productPrice").innerHTML =
-            formatPrice(0);
-
-            document.getElementById("priceValue").innerHTML =
-            formatPrice(0);
-
-            document.getElementById("deliveryPrice").innerHTML =
-            formatPrice(0);
-
-            document.getElementById("totalPrice").innerHTML =
-            formatPrice(0);
-
-            // العودة لأول مناسبة
+            // العودة لأول مناسبة بعد نجاح الطلب
             if(products.length){
 
                 const firstBtn =
@@ -390,15 +364,6 @@ async function sendOrder(){
     }
 
 }
-
-//================================
-// السماح بالأرقام فقط في الهاتف
-//================================
-document.getElementById("phone").addEventListener("input",function(){
-
-    this.value = this.value.replace(/\D/g,"");
-
-});
 
 //================================
 // إغلاق نافذة النجاح
