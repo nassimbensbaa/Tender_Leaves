@@ -31,7 +31,7 @@ async function loadProducts(){
         document.getElementById("categories").innerHTML = html;
 
         // اختيار أول مناسبة تلقائياً
-        if(products.length>0){
+        if(products.length){
 
             const firstBtn =
             document.querySelector(".category-btn");
@@ -58,6 +58,25 @@ function selectProduct(index,btn){
     selectedProduct = products[index];
 
     PRODUCT_PRICE = Number(selectedProduct.price);
+
+    //==============================
+    // Meta Pixel - ViewContent
+    //==============================
+    if(typeof fbq !== "undefined"){
+
+        fbq("track","ViewContent",{
+
+            content_name:selectedProduct.name,
+
+            content_category:"Tender-leaves",
+
+            value:PRODUCT_PRICE,
+
+            currency:"DZD"
+
+        });
+
+    }
 
     const img =
     document.getElementById("mainImage");
@@ -92,7 +111,6 @@ function selectProduct(index,btn){
     updateTotal();
 
 }
-
 //================================
 // تحميل الولايات
 //================================
@@ -150,6 +168,7 @@ document.addEventListener("change",function(e){
     }
 
 });
+
 //================================
 // حساب المجموع
 //================================
@@ -238,23 +257,23 @@ async function sendOrder(){
 
     }
 
-if(phone==""){
+    if(phone==""){
 
-    alert("أدخل رقم الهاتف");
+        alert("أدخل رقم الهاتف");
 
-    return;
+        return;
 
-}
+    }
 
-const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
 
-if(!phoneRegex.test(phone)){
+    if(!phoneRegex.test(phone)){
 
-    alert("يرجى إدخال رقم هاتف صحيح");
+        alert("يرجى إدخال رقم هاتف صحيح");
 
-    return;
+        return;
 
-}
+    }
 
     if(wilaya==""){
 
@@ -305,6 +324,21 @@ if(!phoneRegex.test(phone)){
 
     };
 
+    //==============================
+    // Meta Pixel - InitiateCheckout
+    //==============================
+    if(typeof fbq !== "undefined"){
+
+        fbq("track","InitiateCheckout",{
+
+            value:total,
+
+            currency:"DZD"
+
+        });
+
+    }
+
     try{
 
         const res = await fetch("/api/send",{
@@ -320,12 +354,28 @@ if(!phoneRegex.test(phone)){
         });
 
         const result = await res.json();
+                if(result.ok){
 
-        if(result.ok){
+            //==============================
+            // Meta Pixel - Purchase
+            //==============================
+            if(typeof fbq !== "undefined"){
+
+                fbq("track","Purchase",{
+
+                    value:total,
+
+                    currency:"DZD",
+
+                    content_name:selectedProduct.name
+
+                });
+
+            }
 
             document.getElementById("successModal").style.display="flex";
 
-                    document.getElementById("recipientName").value = "";
+            document.getElementById("recipientName").value = "";
 
             document.getElementById("notes").value = "";
 
@@ -378,6 +428,15 @@ function closeModal(){
 // تشغيل التطبيق
 //================================
 window.onload = function(){
+
+    //==============================
+    // Meta Pixel - PageView
+    //==============================
+    if(typeof fbq !== "undefined"){
+
+        fbq("track","PageView");
+
+    }
 
     loadProducts();
 
