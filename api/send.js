@@ -19,6 +19,15 @@ export default async function handler(req, res) {
 
         const GOOGLE_URL = process.env.GOOGLE_SCRIPT_URL;
 
+        if (!GOOGLE_URL) {
+
+            return res.status(500).json({
+                ok: false,
+                error: "GOOGLE_SCRIPT_URL is missing"
+            });
+
+        }
+
         const response = await fetch(GOOGLE_URL, {
 
             method: "POST",
@@ -31,18 +40,34 @@ export default async function handler(req, res) {
 
         });
 
+        if (!response.ok) {
+
+            throw new Error(`Google Script Error : ${response.status}`);
+
+        }
+
         const result = await response.json();
 
         return res.status(200).json({
+
             ok: true,
+
             result
+
         });
 
-    } catch (err) {
+    }
+
+    catch (err) {
+
+        console.error(err);
 
         return res.status(500).json({
+
             ok: false,
+
             error: err.message
+
         });
 
     }
