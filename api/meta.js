@@ -187,19 +187,22 @@ export default async function handler(req, res) {
 
                 },
 
-                body: JSON.stringify({
+body: JSON.stringify({
 
-                    data: [
+    data: [
 
-                        event
+        event
 
-                    ]
+    ],
 
-                })
+    ...(process.env.META_TEST_EVENT_CODE && {
 
-            }
+        test_event_code:
+            process.env.META_TEST_EVENT_CODE
 
-        );
+    })
+
+})
 
         //----------------------------------
         // قراءة رد Meta
