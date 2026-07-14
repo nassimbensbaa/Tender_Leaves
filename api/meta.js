@@ -15,9 +15,7 @@ export default async function handler(req, res) {
     //----------------------------------
 
     if (req.method === "OPTIONS") {
-
         return res.status(200).end();
-
     }
 
     //----------------------------------
@@ -29,7 +27,6 @@ export default async function handler(req, res) {
         return res.status(405).json({
 
             ok: false,
-
             error: "Method Not Allowed"
 
         });
@@ -39,24 +36,18 @@ export default async function handler(req, res) {
     try {
 
         //----------------------------------
-        // متغيرات البيئة
+        // Environment Variables
         //----------------------------------
 
-        const PIXEL_ID =
-            process.env.META_PIXEL_ID;
-
-        const ACCESS_TOKEN =
-            process.env.META_ACCESS_TOKEN;
-
-        const TEST_EVENT_CODE =
-            process.env.META_TEST_EVENT_CODE || "";
+        const PIXEL_ID = process.env.META_PIXEL_ID;
+        const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+        const TEST_EVENT_CODE = process.env.META_TEST_EVENT_CODE || "";
 
         if (!PIXEL_ID) {
 
             return res.status(500).json({
 
                 ok: false,
-
                 error: "META_PIXEL_ID is missing"
 
             });
@@ -68,7 +59,6 @@ export default async function handler(req, res) {
             return res.status(500).json({
 
                 ok: false,
-
                 error: "META_ACCESS_TOKEN is missing"
 
             });
@@ -76,7 +66,7 @@ export default async function handler(req, res) {
         }
 
         //----------------------------------
-        // قراءة البيانات القادمة من الموقع
+        // Request Body
         //----------------------------------
 
         const {
@@ -94,38 +84,29 @@ export default async function handler(req, res) {
 
         } = req.body;
                 //----------------------------------
-        // الحصول على عنوان IP
+        // Client IP
         //----------------------------------
 
         const clientIp =
-
-            req.headers["x-forwarded-for"]?.split(",")[0].trim()
-
+            (req.headers["x-forwarded-for"] || "")
+                .split(",")[0]
+                .trim()
             ||
-
-            req.headers["x-real-ip"]
-
-            ||
-
             req.socket?.remoteAddress
-
             ||
-
             "";
 
         //----------------------------------
-        // تشفير رقم الهاتف SHA256
+        // SHA256 Phone
         //----------------------------------
 
         let phoneHash = "";
 
         if (phone) {
 
-            const normalizedPhone =
-
-                String(phone)
-                    .replace(/\s+/g, "")
-                    .replace(/-/g, "");
+            const normalizedPhone = String(phone)
+                .replace(/\s+/g, "")
+                .replace(/-/g, "");
 
             phoneHash = crypto
                 .createHash("sha256")
@@ -135,7 +116,7 @@ export default async function handler(req, res) {
         }
 
         //----------------------------------
-        // إنشاء الحدث
+        // Event Object
         //----------------------------------
 
         const event = {
@@ -178,9 +159,9 @@ export default async function handler(req, res) {
 
             custom_data: {
 
-                currency: currency || "DZD",
-
                 value: Number(value || 0),
+
+                currency: currency || "DZD",
 
                 content_name: productName || "",
 
@@ -189,8 +170,9 @@ export default async function handler(req, res) {
             }
 
         };
-                //----------------------------------
-        // تجهيز Body المرسل إلى Meta
+
+        //----------------------------------
+        // Request Body to Meta
         //----------------------------------
 
         const body = {
@@ -212,8 +194,7 @@ export default async function handler(req, res) {
             body.test_event_code = TEST_EVENT_CODE;
 
         }
-
-        //----------------------------------
+                //----------------------------------
         // إرسال الحدث إلى Meta
         //----------------------------------
 
@@ -243,40 +224,25 @@ export default async function handler(req, res) {
 
         const result = await response.json();
 
-        console.log(
+        console.log("===== META RESPONSE =====");
 
-            "===== META RESPONSE ====="
+        console.log(JSON.stringify(result, null, 2));
 
-        );
-
-        console.log(
-
-            JSON.stringify(result, null, 2)
-
-        );
-                //----------------------------------
-        // إذا أعادت Meta خطأ
+        //----------------------------------
+        // في حالة وجود خطأ
         //----------------------------------
 
         if (!response.ok) {
 
-            console.error(
+            console.error("===== META API ERROR =====");
 
-                "===== META API ERROR ====="
-
-            );
-
-            console.error(
-
-                JSON.stringify(result, null, 2)
-
-            );
+            console.error(JSON.stringify(result, null, 2));
 
             return res.status(response.status).json({
 
                 ok: false,
 
-                message: "Meta Graph API Error",
+                error: "Meta Graph API Error",
 
                 meta: result
 
@@ -294,52 +260,21 @@ export default async function handler(req, res) {
 
             message: "Event sent successfully",
 
-            eventId: eventId,
+            eventId,
 
             meta: result
 
         });
-
     }
+
+    //----------------------------------
+    // معالجة الأخطاء
+    //----------------------------------
 
     catch (err) {
 
-        //----------------------------------
-        // تسجيل الخطأ بالكامل
-        //----------------------------------
-
-        console.error(
-
-            "===== META FUNCTION ERROR ====="
-
-        );
-
+        console.error("===== META FUNCTION ERROR =====");
         console.error(err);
-
-        console.error(err.stack);
-
-        return res.status(500).json({
-
-            ok: false,
-
-            error: err.message,
-
-            stack: process.env.NODE_ENV === "development"
-                ? err.stack
-                : undefined
-
-        });
-
-    }
-        catch (err) {
-
-        console.error(
-            "===== META FUNCTION ERROR ====="
-        );
-
-        console.error(err);
-
-        console.error(err.stack);
 
         return res.status(500).json({
 
