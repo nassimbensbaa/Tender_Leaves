@@ -10,11 +10,19 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
+    //----------------------------------
+    // OPTIONS
+    //----------------------------------
+
     if (req.method === "OPTIONS") {
 
         return res.status(200).end();
 
     }
+
+    //----------------------------------
+    // POST فقط
+    //----------------------------------
 
     if (req.method !== "POST") {
 
@@ -31,7 +39,7 @@ export default async function handler(req, res) {
     try {
 
         //----------------------------------
-        // Variables
+        // متغيرات البيئة
         //----------------------------------
 
         const PIXEL_ID =
@@ -40,59 +48,82 @@ export default async function handler(req, res) {
         const ACCESS_TOKEN =
             process.env.META_ACCESS_TOKEN;
 
-        if (!PIXEL_ID || !ACCESS_TOKEN) {
+        const TEST_EVENT_CODE =
+            process.env.META_TEST_EVENT_CODE || "";
+
+        if (!PIXEL_ID) {
 
             return res.status(500).json({
 
                 ok: false,
 
-                error: "META_PIXEL_ID or META_ACCESS_TOKEN is missing"
+                error: "META_PIXEL_ID is missing"
+
+            });
+
+        }
+
+        if (!ACCESS_TOKEN) {
+
+            return res.status(500).json({
+
+                ok: false,
+
+                error: "META_ACCESS_TOKEN is missing"
 
             });
 
         }
 
         //----------------------------------
-        // Request Body
+        // قراءة البيانات القادمة من الموقع
         //----------------------------------
 
         const {
 
             eventName,
             eventId,
-            pageUrl,
-            userAgent,
-            phone,
-            fbp,
-            fbc,
+            productName,
             value,
             currency,
-            productName
+            phone,
+            pageUrl,
+            userAgent,
+            fbp,
+            fbc
 
         } = req.body;
                 //----------------------------------
-        // Client IP
+        // الحصول على عنوان IP
         //----------------------------------
 
         const clientIp =
-            (req.headers["x-forwarded-for"] || "")
-                .split(",")[0]
-                .trim()
+
+            req.headers["x-forwarded-for"]?.split(",")[0].trim()
+
             ||
+
+            req.headers["x-real-ip"]
+
+            ||
+
             req.socket?.remoteAddress
+
             ||
+
             "";
 
         //----------------------------------
-        // SHA256 Phone
+        // تشفير رقم الهاتف SHA256
         //----------------------------------
 
-        let phoneHash = undefined;
+        let phoneHash = "";
 
         if (phone) {
 
             const normalizedPhone =
-                phone
+
+                String(phone)
                     .replace(/\s+/g, "")
                     .replace(/-/g, "");
 
@@ -104,37 +135,30 @@ export default async function handler(req, res) {
         }
 
         //----------------------------------
-        // Meta Event
+        // إنشاء الحدث
         //----------------------------------
 
         const event = {
 
-            event_name:
-                eventName,
+            event_name: eventName,
 
-            event_time:
-                Math.floor(Date.now() / 1000),
+            event_time: Math.floor(Date.now() / 1000),
 
-            event_id:
-                eventId,
+            event_id: eventId,
 
-            action_source:
-                "website",
+            action_source: "website",
 
-            event_source_url:
-                pageUrl,
+            event_source_url: pageUrl,
 
             user_data: {
 
-                client_ip_address:
-                    clientIp,
+                client_ip_address: clientIp,
 
-                client_user_agent:
-                    userAgent,
+                client_user_agent: userAgent,
 
                 ...(phoneHash && {
 
-                    ph: phoneHash
+                    ph: [phoneHash]
 
                 }),
 
@@ -154,22 +178,42 @@ export default async function handler(req, res) {
 
             custom_data: {
 
-                currency:
-                    currency || "DZD",
+                currency: currency || "DZD",
 
-                value:
-                    Number(value || 0),
+                value: Number(value || 0),
 
-                content_name:
-                    productName || "",
+                content_name: productName || "",
 
-                content_type:
-                    "product"
+                content_type: "product"
 
             }
 
         };
                 //----------------------------------
+        // تجهيز Body المرسل إلى Meta
+        //----------------------------------
+
+        const body = {
+
+            data: [
+
+                event
+
+            ]
+
+        };
+
+        //----------------------------------
+        // Test Event Code (اختياري)
+        //----------------------------------
+
+        if (TEST_EVENT_CODE) {
+
+            body.test_event_code = TEST_EVENT_CODE;
+
+        }
+
+        //----------------------------------
         // إرسال الحدث إلى Meta
         //----------------------------------
 
@@ -187,46 +231,52 @@ export default async function handler(req, res) {
 
                 },
 
-body: JSON.stringify({
+                body: JSON.stringify(body)
 
-    data: [
+            }
 
-        event
-
-    ],
-
-    ...(process.env.META_TEST_EVENT_CODE && {
-
-        test_event_code:
-            process.env.META_TEST_EVENT_CODE
-
-    })
-
-})
+        );
 
         //----------------------------------
-        // قراءة رد Meta
+        // قراءة استجابة Meta
         //----------------------------------
 
         const result = await response.json();
 
         console.log(
 
-            "Meta Response:",
+            "===== META RESPONSE ====="
+
+        );
+
+        console.log(
 
             JSON.stringify(result, null, 2)
 
         );
-
-        //----------------------------------
-        // في حالة وجود خطأ
+                //----------------------------------
+        // إذا أعادت Meta خطأ
         //----------------------------------
 
         if (!response.ok) {
 
-            return res.status(500).json({
+            console.error(
+
+                "===== META API ERROR ====="
+
+            );
+
+            console.error(
+
+                JSON.stringify(result, null, 2)
+
+            );
+
+            return res.status(response.status).json({
 
                 ok: false,
+
+                message: "Meta Graph API Error",
 
                 meta: result
 
@@ -242,6 +292,10 @@ body: JSON.stringify({
 
             ok: true,
 
+            message: "Event sent successfully",
+
+            eventId: eventId,
+
             meta: result
 
         });
@@ -250,17 +304,56 @@ body: JSON.stringify({
 
     catch (err) {
 
+        //----------------------------------
+        // تسجيل الخطأ بالكامل
+        //----------------------------------
+
+        console.error(
+
+            "===== META FUNCTION ERROR ====="
+
+        );
+
         console.error(err);
+
+        console.error(err.stack);
 
         return res.status(500).json({
 
             ok: false,
 
-            error: err.message
+            error: err.message,
+
+            stack: process.env.NODE_ENV === "development"
+                ? err.stack
+                : undefined
+
+        });
+
+    }
+        catch (err) {
+
+        console.error(
+            "===== META FUNCTION ERROR ====="
+        );
+
+        console.error(err);
+
+        console.error(err.stack);
+
+        return res.status(500).json({
+
+            ok: false,
+
+            error: err.message,
+
+            stack:
+                process.env.NODE_ENV === "development"
+                    ? err.stack
+                    : undefined
 
         });
 
     }
 
 }
-
