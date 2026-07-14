@@ -1,21 +1,13 @@
-//==================================================
-// Tender-leaves
-// script.js
-// Meta Pixel + Meta Conversions API
-//==================================================
-
-//==============================
-// المتغيرات العامة
-//==============================
 let products = [];
 let deliveryData = [];
 let PRODUCT_PRICE = 0;
 let selectedProduct = null;
 
-//==============================
-// إنشاء Event ID
-//==============================
-function createEventId() {
+/*=================================
+Meta
+=================================*/
+
+function generateEventId() {
 
     if (window.crypto && crypto.randomUUID) {
 
@@ -23,21 +15,17 @@ function createEventId() {
 
     }
 
-    return "evt_" +
-        Date.now() +
-        "_" +
-        Math.random().toString(36).substring(2);
+    return "event_" + Date.now() + "_" + Math.random().toString(36).substring(2);
 
 }
 
-//==============================
-// قراءة Cookie
-//==============================
 function getCookie(name) {
 
-    const value = "; " + document.cookie;
+    const value =
+        "; " + document.cookie;
 
-    const parts = value.split("; " + name + "=");
+    const parts =
+        value.split("; " + name + "=");
 
     if (parts.length === 2) {
 
@@ -49,10 +37,50 @@ function getCookie(name) {
 
 }
 
-//==============================
-// إرسال حدث إلى Conversions API
-//==============================
-async function sendServerEvent(payload) {
+async function trackEvent(eventName, data = {}) {
+
+    const eventId =
+        generateEventId();
+
+    //--------------------------------
+    // Meta Pixel
+    //--------------------------------
+
+    if (typeof fbq !== "undefined") {
+
+        fbq(
+
+            "track",
+
+            eventName,
+
+            {
+
+                content_name:
+                    data.content_name || "",
+
+                value:
+                    Number(data.value || 0),
+
+                currency:
+                    data.currency || "DZD"
+
+            },
+
+            {
+
+                eventID:
+                    eventId
+
+            }
+
+        );
+
+    }
+
+    //--------------------------------
+    // Meta Conversions API
+    //--------------------------------
 
     try {
 
@@ -66,7 +94,37 @@ async function sendServerEvent(payload) {
 
             },
 
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+
+                eventName,
+
+                eventId,
+
+                value:
+                    Number(data.value || 0),
+
+                currency:
+                    data.currency || "DZD",
+
+                productName:
+                    data.content_name || "",
+
+                phone:
+                    data.phone || "",
+
+                pageUrl:
+                    window.location.href,
+
+                userAgent:
+                    navigator.userAgent,
+
+                fbp:
+                    getCookie("_fbp"),
+
+                fbc:
+                    getCookie("_fbc")
+
+            })
 
         });
 
@@ -74,105 +132,33 @@ async function sendServerEvent(payload) {
 
     catch (err) {
 
-        console.error("Meta CAPI Error:", err);
+        console.error(err);
 
     }
 
-}
-
-//==============================
-// إرسال حدث إلى Pixel + CAPI
-//==============================
-async function trackEvent(eventName, params = {}) {
-
-    const eventId = createEventId();
-
-    //--------------------------
-    // Meta Pixel
-    //--------------------------
-    if (typeof fbq !== "undefined") {
-
-        fbq(
-
-            "track",
-
-            eventName,
-
-            params,
-
-            {
-
-                eventID: eventId
-
-            }
-
-        );
-
-    }
-
-    //--------------------------
-    // Meta Conversions API
-    //--------------------------
-    await sendServerEvent({
-
-        eventName,
-
-        eventId,
-
-        pageUrl: window.location.href,
-
-        userAgent: navigator.userAgent,
-
-        phone: params.phone || "",
-
-        fbp: getCookie("_fbp"),
-
-        fbc: getCookie("_fbc"),
-
-        value: params.value || 0,
-
-        currency: params.currency || "DZD",
-
-        productName: params.content_name || ""
-
-    });
+    return eventId;
 
 }
-
-//==============================
-// تنسيق السعر
-//==============================
-function formatPrice(price) {
-
-    return Number(price).toLocaleString("fr-DZ");
-
-}
-//==============================
-// تحميل التصاميم
-//==============================
+//================================
+// تحميل المنتجات
+//================================
 async function loadProducts() {
 
     try {
 
         const res = await fetch("/api/products");
 
-        if (!res.ok) {
-
-            throw new Error("تعذر تحميل المنتجات");
-
-        }
-
         products = await res.json();
 
         let html = "";
 
-        products.forEach((product, index) => {
+        products.forEach((p, index) => {
 
             html += `
                 <button
                     class="category-btn"
-                    onclick="selectProduct(${index}, this)">
-                    ${product.name}
+                    onclick="selectProduct(${index},this)">
+                    ${p.name}
                 </button>
             `;
 
@@ -183,6 +169,7 @@ async function loadProducts() {
         //--------------------------------
         // اختيار أول تصميم تلقائياً
         //--------------------------------
+
         if (products.length > 0) {
 
             const firstButton =
@@ -204,75 +191,27 @@ async function loadProducts() {
 
         console.error(err);
 
-        alert("تعذر تحميل التصاميم");
+        alert("تعذر تحميل المنتجات");
 
     }
 
 }
 
-//==============================
-// اختيار التصميم
-//==============================
-async function selectProduct(index, button) {
+//================================
+// اختيار منتج
+//================================
+async function selectProduct(index, btn) {
+
+    selectedProduct =
+        products[index];
+
+    PRODUCT_PRICE =
+        Number(selectedProduct.price);
 
     //--------------------------------
-    // حفظ المنتج الحالي
+    // إرسال ViewContent
     //--------------------------------
-    selectedProduct = products[index];
 
-    PRODUCT_PRICE = Number(selectedProduct.price);
-
-    //--------------------------------
-    // تحديث الصورة
-    //--------------------------------
-    const image =
-        document.getElementById("mainImage");
-
-    image.style.opacity = "0";
-
-    image.src =
-        "images/" + selectedProduct.image;
-
-    image.onload = function () {
-
-        image.style.opacity = "1";
-
-    };
-
-    //--------------------------------
-    // تحديث السعر
-    //--------------------------------
-    document.getElementById("productPrice").textContent =
-        formatPrice(PRODUCT_PRICE);
-
-    document.getElementById("priceValue").textContent =
-        formatPrice(PRODUCT_PRICE);
-
-    //--------------------------------
-    // تفعيل الزر الحالي
-    //--------------------------------
-    document
-        .querySelectorAll(".category-btn")
-        .forEach(btn => {
-
-            btn.classList.remove("active");
-
-        });
-
-    if (button) {
-
-        button.classList.add("active");
-
-    }
-
-    //--------------------------------
-    // تحديث الإجمالي
-    //--------------------------------
-    updateTotal();
-
-    //--------------------------------
-    // إرسال حدث ViewContent
-    //--------------------------------
     await trackEvent(
 
         "ViewContent",
@@ -281,9 +220,6 @@ async function selectProduct(index, button) {
 
             content_name:
                 selectedProduct.name,
-
-            content_category:
-                "Tender-leaves",
 
             value:
                 PRODUCT_PRICE,
@@ -295,25 +231,74 @@ async function selectProduct(index, button) {
 
     );
 
+    //--------------------------------
+    // تغيير الصورة
+    //--------------------------------
+
+    const img =
+        document.getElementById("mainImage");
+
+    img.style.opacity = "0";
+
+    img.src =
+        "images/" + selectedProduct.image;
+
+    img.onload = function () {
+
+        img.style.opacity = "1";
+
+    };
+
+    //--------------------------------
+    // تحديث الأسعار
+    //--------------------------------
+
+    document.getElementById("productPrice").textContent =
+        PRODUCT_PRICE;
+
+    document.getElementById("priceValue").textContent =
+        PRODUCT_PRICE;
+
+    //--------------------------------
+    // الزر النشط
+    //--------------------------------
+
+    document
+        .querySelectorAll(".category-btn")
+        .forEach(button => {
+
+            button.classList.remove("active");
+
+        });
+
+    if (btn) {
+
+        btn.classList.add("active");
+
+    }
+
+    //--------------------------------
+    // تحديث المجموع
+    //--------------------------------
+
+    updateTotal();
+
 }
-//==============================
+//================================
 // تحميل أسعار التوصيل
-//==============================
+//================================
 async function loadDelivery() {
 
     try {
 
-        const res = await fetch("/api/delivery");
+        const res =
+            await fetch("/api/delivery");
 
-        if (!res.ok) {
+        deliveryData =
+            await res.json();
 
-            throw new Error("تعذر تحميل بيانات التوصيل");
-
-        }
-
-        deliveryData = await res.json();
-
-        let html = '<option value="">اختر الولاية</option>';
+        let html =
+            '<option value="">اختر الولاية</option>';
 
         deliveryData.forEach(item => {
 
@@ -325,7 +310,8 @@ async function loadDelivery() {
 
         });
 
-        document.getElementById("wilaya").innerHTML = html;
+        document.getElementById("wilaya").innerHTML =
+            html;
 
     }
 
@@ -333,43 +319,39 @@ async function loadDelivery() {
 
         console.error(err);
 
-        alert("تعذر تحميل بيانات التوصيل");
+        alert("تعذر تحميل أسعار التوصيل");
 
     }
 
 }
 
-//==============================
-// تحديث السعر عند تغيير الولاية
-//==============================
-document.addEventListener(
+//================================
+// تحديث الأسعار عند تغيير الولاية
+//================================
+document.addEventListener("change", function (e) {
 
-    "change",
+    if (
 
-    function (e) {
+        e.target.id === "wilaya"
 
-        if (
+        ||
 
-            e.target.id === "wilaya"
+        e.target.id === "deliveryType"
 
-            ||
+    ) {
 
-            e.target.id === "deliveryType"
-
-        ) {
-
-            updateTotal();
-
-        }
+        updateTotal();
 
     }
 
-);
+});
 
-//==============================
-// الحصول على سعر التوصيل
-//==============================
-function getDeliveryPrice() {
+//================================
+// حساب السعر الإجمالي
+//================================
+function updateTotal() {
+
+    let deliveryPrice = 0;
 
     const wilaya =
         document.getElementById("wilaya").value;
@@ -377,57 +359,38 @@ function getDeliveryPrice() {
     const deliveryType =
         document.getElementById("deliveryType").value;
 
-    if (!wilaya) {
-
-        return 0;
-
-    }
-
     const row =
-        deliveryData.find(
+        deliveryData.find(item => item.name === wilaya);
 
-            item => item.name === wilaya
+    if (row) {
 
-        );
+        if (deliveryType === "home") {
 
-    if (!row) {
+            deliveryPrice =
+                Number(row.home);
 
-        return 0;
+        }
+
+        else {
+
+            deliveryPrice =
+                Number(row.office);
+
+        }
 
     }
-
-    if (deliveryType === "home") {
-
-        return Number(row.home);
-
-    }
-
-    return Number(row.office);
-
-}
-
-//==============================
-// تحديث الأسعار
-//==============================
-function updateTotal() {
-
-    const deliveryPrice =
-        getDeliveryPrice();
-
-    const total =
-        PRODUCT_PRICE + deliveryPrice;
 
     document.getElementById("deliveryPrice").textContent =
-        formatPrice(deliveryPrice);
+        deliveryPrice;
 
     document.getElementById("totalPrice").textContent =
-        formatPrice(total);
+        PRODUCT_PRICE + deliveryPrice;
 
 }
 
-//==============================
+//================================
 // إعادة تعيين النموذج
-//==============================
+//================================
 function resetForm() {
 
     document.getElementById("recipientName").value = "";
@@ -447,15 +410,16 @@ function resetForm() {
     updateTotal();
 
 }
-//==============================
+//================================
 // إرسال الطلب
-//==============================
+//================================
 async function sendOrder() {
 
     //--------------------------------
-    // التأكد من اختيار تصميم
+    // التحقق من اختيار المنتج
     //--------------------------------
-    if (!selectedProduct) {
+
+    if (selectedProduct == null) {
 
         alert("اختر نوع التصميم");
 
@@ -466,6 +430,7 @@ async function sendOrder() {
     //--------------------------------
     // قراءة البيانات
     //--------------------------------
+
     const recipientName =
         document.getElementById("recipientName").value.trim();
 
@@ -490,9 +455,10 @@ async function sendOrder() {
     //--------------------------------
     // التحقق من الحقول
     //--------------------------------
+
     if (recipientName === "") {
 
-        alert("أدخل اسم الناجح / الناجحة");
+        alert("أدخل اسم الناجح");
 
         return;
 
@@ -500,7 +466,7 @@ async function sendOrder() {
 
     if (fullName === "") {
 
-        alert("أدخل اسم طالب المنتج");
+        alert("أدخل الاسم الكامل");
 
         return;
 
@@ -514,7 +480,8 @@ async function sendOrder() {
 
     }
 
-    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    const phoneRegex =
+        /^(05|06|07)[0-9]{8}$/;
 
     if (!phoneRegex.test(phone)) {
 
@@ -533,43 +500,54 @@ async function sendOrder() {
     }
 
     //--------------------------------
-    // حساب الأسعار
+    // حساب سعر التوصيل
     //--------------------------------
+
+    const row =
+        deliveryData.find(x => x.name === wilaya);
+
     const deliveryPrice =
-        getDeliveryPrice();
+        deliveryType === "home"
+            ? Number(row.home)
+            : Number(row.office);
 
     const total =
         PRODUCT_PRICE + deliveryPrice;
 
     //--------------------------------
-    // إرسال حدث InitiateCheckout
+    // إرسال InitiateCheckout
     //--------------------------------
-    await trackEvent(
 
-        "InitiateCheckout",
+    const eventId =
+        await trackEvent(
 
-        {
+            "InitiateCheckout",
 
-            content_name:
-                selectedProduct.name,
+            {
 
-            value:
-                total,
+                content_name:
+                    selectedProduct.name,
 
-            currency:
-                "DZD",
+                value:
+                    total,
 
-            phone:
-                phone
+                currency:
+                    "DZD",
 
-        }
+                phone:
+                    phone
 
-    );
+            }
+
+        );
 
     //--------------------------------
     // تجهيز بيانات الطلب
     //--------------------------------
+
     const orderData = {
+
+        eventId,
 
         productName:
             selectedProduct.name,
@@ -578,6 +556,8 @@ async function sendOrder() {
             selectedProduct.image,
 
         recipientName,
+
+        notes,
 
         fullName,
 
@@ -589,33 +569,20 @@ async function sendOrder() {
 
         officeName,
 
-        notes,
-
         productPrice:
             PRODUCT_PRICE,
 
         deliveryPrice,
 
-        total,
-
-        pageUrl:
-            window.location.href,
-
-        userAgent:
-            navigator.userAgent,
-
-        fbp:
-            getCookie("_fbp"),
-
-        fbc:
-            getCookie("_fbc")
+        total
 
     };
 
-    //--------------------------------
-    // إرسال الطلب إلى API
-    //--------------------------------
     try {
+
+        //--------------------------------
+        // إرسال الطلب
+        //--------------------------------
 
         const response =
             await fetch(
@@ -645,11 +612,13 @@ async function sendOrder() {
                 //--------------------------------
         // نجاح إرسال الطلب
         //--------------------------------
-        if (result.ok) {
+
+        if (response.ok && result.ok) {
 
             //--------------------------------
             // إرسال Purchase
             //--------------------------------
+
             await trackEvent(
 
                 "Purchase",
@@ -675,17 +644,20 @@ async function sendOrder() {
             //--------------------------------
             // نافذة النجاح
             //--------------------------------
+
             document.getElementById("successModal").style.display =
                 "flex";
 
             //--------------------------------
             // إعادة تعيين النموذج
             //--------------------------------
+
             resetForm();
 
             //--------------------------------
-            // العودة لأول تصميم
+            // العودة لأول منتج
             //--------------------------------
+
             if (products.length > 0) {
 
                 const firstButton =
@@ -705,7 +677,7 @@ async function sendOrder() {
 
         else {
 
-            alert("فشل إرسال الطلب");
+            alert(result.error || "فشل إرسال الطلب");
 
         }
 
@@ -715,15 +687,15 @@ async function sendOrder() {
 
         console.error(err);
 
-        alert("خطأ في الاتصال بالخادم");
+        alert("حدث خطأ أثناء إرسال الطلب");
 
     }
 
 }
 
-//==============================
+//================================
 // إغلاق نافذة النجاح
-//==============================
+//================================
 function closeModal() {
 
     document.getElementById("successModal").style.display =
@@ -731,29 +703,25 @@ function closeModal() {
 
 }
 
-//==============================
+//================================
 // تشغيل الموقع
-//==============================
+//================================
 window.onload = async function () {
 
     //--------------------------------
-    // تحميل بيانات التوصيل أولاً
+    // تحميل البيانات
     //--------------------------------
+
     await loadDelivery();
 
-    //--------------------------------
-    // تحميل المنتجات
-    //--------------------------------
     await loadProducts();
 
-    //--------------------------------
-    // تحديث الأسعار
-    //--------------------------------
     updateTotal();
 
     //--------------------------------
     // إرسال PageView
     //--------------------------------
+
     await trackEvent(
 
         "PageView",
