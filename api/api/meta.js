@@ -2,25 +2,43 @@ import crypto from "crypto";
 
 export default async function handler(req, res) {
 
+    //----------------------------------
+    // CORS
+    //----------------------------------
+
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     if (req.method === "OPTIONS") {
+
         return res.status(200).end();
+
     }
 
     if (req.method !== "POST") {
+
         return res.status(405).json({
+
             ok: false,
+
             error: "Method Not Allowed"
+
         });
+
     }
 
     try {
 
-        const PIXEL_ID = process.env.META_PIXEL_ID;
-        const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
+        //----------------------------------
+        // Variables
+        //----------------------------------
+
+        const PIXEL_ID =
+            process.env.META_PIXEL_ID;
+
+        const ACCESS_TOKEN =
+            process.env.META_ACCESS_TOKEN;
 
         if (!PIXEL_ID || !ACCESS_TOKEN) {
 
@@ -33,6 +51,10 @@ export default async function handler(req, res) {
             });
 
         }
+
+        //----------------------------------
+        // Request Body
+        //----------------------------------
 
         const {
 
@@ -48,16 +70,31 @@ export default async function handler(req, res) {
             productName
 
         } = req.body;
+                //----------------------------------
+        // Client IP
+        //----------------------------------
+
+        const clientIp =
+            (req.headers["x-forwarded-for"] || "")
+                .split(",")[0]
+                .trim()
+            ||
+            req.socket?.remoteAddress
+            ||
+            "";
 
         //----------------------------------
-        // تشفير الهاتف SHA256
+        // SHA256 Phone
         //----------------------------------
+
         let phoneHash = undefined;
 
         if (phone) {
 
             const normalizedPhone =
-                phone.replace(/\s+/g, "");
+                phone
+                    .replace(/\s+/g, "")
+                    .replace(/-/g, "");
 
             phoneHash = crypto
                 .createHash("sha256")
@@ -67,47 +104,75 @@ export default async function handler(req, res) {
         }
 
         //----------------------------------
-        // بيانات الحدث
+        // Meta Event
         //----------------------------------
+
         const event = {
 
-            event_name: eventName,
+            event_name:
+                eventName,
 
-            event_time: Math.floor(Date.now() / 1000),
+            event_time:
+                Math.floor(Date.now() / 1000),
 
-            event_id: eventId,
+            event_id:
+                eventId,
 
-            action_source: "website",
+            action_source:
+                "website",
 
-            event_source_url: pageUrl,
+            event_source_url:
+                pageUrl,
 
             user_data: {
 
-                client_user_agent: userAgent,
+                client_ip_address:
+                    clientIp,
 
-                ...(phoneHash && { ph: phoneHash }),
+                client_user_agent:
+                    userAgent,
 
-                ...(fbp && { fbp }),
+                ...(phoneHash && {
 
-                ...(fbc && { fbc })
+                    ph: phoneHash
+
+                }),
+
+                ...(fbp && {
+
+                    fbp
+
+                }),
+
+                ...(fbc && {
+
+                    fbc
+
+                })
 
             },
 
             custom_data: {
 
-                currency: currency || "DZD",
+                currency:
+                    currency || "DZD",
 
-                value: Number(value || 0),
+                value:
+                    Number(value || 0),
 
-                content_name: productName || ""
+                content_name:
+                    productName || "",
+
+                content_type:
+                    "product"
 
             }
 
         };
+                //----------------------------------
+        // إرسال الحدث إلى Meta
+        //----------------------------------
 
-        //----------------------------------
-        // إرسال إلى Meta
-        //----------------------------------
         const response = await fetch(
 
             `https://graph.facebook.com/v23.0/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`,
@@ -124,7 +189,11 @@ export default async function handler(req, res) {
 
                 body: JSON.stringify({
 
-                    data: [event]
+                    data: [
+
+                        event
+
+                    ]
 
                 })
 
@@ -132,7 +201,23 @@ export default async function handler(req, res) {
 
         );
 
+        //----------------------------------
+        // قراءة رد Meta
+        //----------------------------------
+
         const result = await response.json();
+
+        console.log(
+
+            "Meta Response:",
+
+            JSON.stringify(result, null, 2)
+
+        );
+
+        //----------------------------------
+        // في حالة وجود خطأ
+        //----------------------------------
 
         if (!response.ok) {
 
@@ -145,6 +230,10 @@ export default async function handler(req, res) {
             });
 
         }
+
+        //----------------------------------
+        // نجاح الإرسال
+        //----------------------------------
 
         return res.status(200).json({
 
