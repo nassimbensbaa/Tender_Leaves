@@ -1,16 +1,5 @@
 import crypto from "crypto";
 
-function sha256(value) {
-
-    if (!value) return "";
-
-    return crypto
-        .createHash("sha256")
-        .update(value.trim().toLowerCase())
-        .digest("hex");
-
-}
-
 export default async function handler(req, res) {
 
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -18,138 +7,106 @@ export default async function handler(req, res) {
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
     if (req.method === "OPTIONS") {
-
         return res.status(200).end();
-
     }
 
     if (req.method !== "POST") {
-
         return res.status(405).json({
-
             ok: false,
-
             error: "Method Not Allowed"
-
         });
-
     }
 
     try {
 
-        const ACCESS_TOKEN =
-            process.env.META_ACCESS_TOKEN;
+        const PIXEL_ID = process.env.META_PIXEL_ID;
+        const ACCESS_TOKEN = process.env.META_ACCESS_TOKEN;
 
-        const PIXEL_ID =
-            process.env.META_PIXEL_ID;
-
-        if (!ACCESS_TOKEN || !PIXEL_ID) {
+        if (!PIXEL_ID || !ACCESS_TOKEN) {
 
             return res.status(500).json({
 
                 ok: false,
 
-                error: "Meta variables are missing"
+                error: "META_PIXEL_ID or META_ACCESS_TOKEN is missing"
 
             });
 
         }
 
-        const body = req.body;
-              //----------------------------------
-        // بيانات العميل
+        const {
+
+            eventName,
+            eventId,
+            pageUrl,
+            userAgent,
+            phone,
+            fbp,
+            fbc,
+            value,
+            currency,
+            productName
+
+        } = req.body;
+
         //----------------------------------
-        const userData = {
+        // تشفير الهاتف SHA256
+        //----------------------------------
+        let phoneHash = undefined;
 
-            client_ip_address:
+        if (phone) {
 
-                req.headers["x-forwarded-for"]?.split(",")[0] ||
+            const normalizedPhone =
+                phone.replace(/\s+/g, "");
 
-                req.socket?.remoteAddress ||
-
-                "",
-
-            client_user_agent:
-
-                body.userAgent ||
-
-                req.headers["user-agent"] ||
-
-                ""
-
-        };
-
-        if (body.phone) {
-
-            userData.ph = [
-
-                sha256(body.phone)
-
-            ];
-
-        }
-
-        if (body.fbp) {
-
-            userData.fbp = body.fbp;
-
-        }
-
-        if (body.fbc) {
-
-            userData.fbc = body.fbc;
+            phoneHash = crypto
+                .createHash("sha256")
+                .update(normalizedPhone)
+                .digest("hex");
 
         }
 
         //----------------------------------
-        // إنشاء الحدث
+        // بيانات الحدث
         //----------------------------------
         const event = {
 
-            event_name:
+            event_name: eventName,
 
-                body.eventName,
+            event_time: Math.floor(Date.now() / 1000),
 
-            event_time:
+            event_id: eventId,
 
-                Math.floor(Date.now() / 1000),
+            action_source: "website",
 
-            event_id:
+            event_source_url: pageUrl,
 
-                body.eventId,
+            user_data: {
 
-            action_source:
+                client_user_agent: userAgent,
 
-                "website",
+                ...(phoneHash && { ph: phoneHash }),
 
-            event_source_url:
+                ...(fbp && { fbp }),
 
-                body.pageUrl,
+                ...(fbc && { fbc })
 
-            user_data:
-
-                userData,
+            },
 
             custom_data: {
 
-                currency:
+                currency: currency || "DZD",
 
-                    "DZD",
+                value: Number(value || 0),
 
-                value:
-
-                    Number(body.value || 0),
-
-                content_name:
-
-                    body.productName || ""
+                content_name: productName || ""
 
             }
 
         };
 
         //----------------------------------
-        // إرسال الحدث إلى Meta
+        // إرسال إلى Meta
         //----------------------------------
         const response = await fetch(
 
@@ -167,11 +124,7 @@ export default async function handler(req, res) {
 
                 body: JSON.stringify({
 
-                    data: [
-
-                        event
-
-                    ]
+                    data: [event]
 
                 })
 
@@ -183,13 +136,11 @@ export default async function handler(req, res) {
 
         if (!response.ok) {
 
-            console.error(result);
-
             return res.status(500).json({
 
                 ok: false,
 
-                result
+                meta: result
 
             });
 
@@ -199,7 +150,7 @@ export default async function handler(req, res) {
 
             ok: true,
 
-            result
+            meta: result
 
         });
 
@@ -220,4 +171,3 @@ export default async function handler(req, res) {
     }
 
 }
-
